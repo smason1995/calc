@@ -1,6 +1,6 @@
-# Calculator written using Flex and Bison
+# Calc
 
-CLI calculator using Bison and Flex
+Calculator langauge written in C with Flex (lexical analysis) and Bison (code parsing)
 
 ## Current status:
     - Can be compiled into executable (calc) using Makefile
