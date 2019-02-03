@@ -70,8 +70,6 @@ TAB "\t"
 
 "input" {return 127;}
 
-["][_A-Za-z0-9]*["] {strcpy(yylval.strvar, yytext); return 128;}
-
 [_A-Za-z][_A-Za-z0-9]* {strcpy(yylval.vname, yytext); return 100;}
 
 . {return 999;}
