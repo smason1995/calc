@@ -14,20 +14,10 @@
 
     int first = 0;
 
-    double result = 0;
-
-    short isStr = 0; //is 1 if string, else 0
-
-    typedef union{
-        double numval;
-        char strval[7146];
-    }data;
-
     /* node structure */
     typedef struct node{
         int type;
-        //double data;
-        data value;
+        double data;
         char id[SIZE];
         int children_num;
         struct node* children[CHLDRN];
@@ -61,7 +51,6 @@
     char vname[50];
     double dval;
     struct node* node;
-    char strvar [7146];
 }
 
 /* operators */
@@ -453,9 +442,6 @@ term5: NOT term5 {
 term6: VAL {
         $$ = make(VAL, $1, "");
     } 
-    | STRING {
-        $$ = makeStr(STRING, $1, "");
-    }
     | VAR {
         $$ = make(IDENTIFIER, 0, $1);
     } 
@@ -486,8 +472,7 @@ struct node* make(int type, double data, char* id) {
 
     struct node* node = malloc(sizeof(struct node));
 
-    node->type = type;
-    node->value.numval = data;
+    node->data = data;
     strcpy(node->id, id);
     node->children_num = 0;
     for(i = 0; i < CHLDRN; i++) {
@@ -497,24 +482,6 @@ struct node* make(int type, double data, char* id) {
     return node;
 }
 
-/*
- * Makes a new tree node for new tree element
- */
-struct node* makeStr(int type, char str[], char* id) {
-    int i;
-
-    struct node* node = malloc(sizeof(struct node));
-
-    node->type = type;
-    strcpy(node->value.strval, str);
-    strcpy(node->id, id);
-    node->children_num = 0;
-    for(i = 0; i < CHLDRN; i++) {
-        node->children[i] = NULL;
-    }
-
-    return node;
-}
 /*
  * Attaches child to parent
  */
@@ -559,21 +526,18 @@ int inTable(char* name){
 /*
  * Processes statements that need to return things
  */
-data evalExpression(struct node* node){
+double evalExpression(struct node* node){
     int b;
     double z[2];
     double d;
     switch(node->type) {
-//        case IDENTIFIER: 
-//                return get(node->id);
-//                break;
-        case VAL: 
-                return node->value;
+       case IDENTIFIER: 
+                return get(node->id);
                 break;
-        case STRING:
-                return node->value;
+       case VAL: 
+                return node->data;
                 break;
-/*       case PLUS: 
+       case PLUS: 
                 for(b=0; b<node->children_num; b++){
                     z[b] = evalExpression(node->children[b]);
                }
@@ -655,7 +619,7 @@ data evalExpression(struct node* node){
 			    printf("Input Value: ");
 				scanf("%lg", &d);
 				return d;
-				break;*/
+				break;
         default:
                 printf("Error, %d not a valid node type for an expression.\n", node->type);
                 exit(1);
@@ -667,19 +631,13 @@ data evalExpression(struct node* node){
  */
 void evalStatement(struct node* node){
 	int x;
-	data val;
+	double val;
     switch(node->type){
         case PRINT:  
-            if(node->children[0]->type == VAL){
-                val = evalExpression(node->children[0]);
-                printf("%9.6f\n", val.numval);
-            }
-            else if(node->children[0]->type == STRING){
-                val = evalExpression(node->children[0]);
-                printf("%s\n", val.strval);
-            }
+            evalExpression(node->children[0]);
+            printf("%9.6f\n", val);
             break;
-/*        case IF: 
+        case IF: 
             if(evalExpression(node->children[0])){
                 evalStatement(node->children[1]);
             }
@@ -706,7 +664,7 @@ void evalStatement(struct node* node){
             else{
                 add(node->children[0]->id, evalExpression(node->children[1]));
             }
-            break;*/
+            break;
 
         default:
             printf("Error, %d not a valid node type for a statement.\n", node->type);
@@ -730,7 +688,7 @@ void use(struct node* node){
 		}
     }
     else{
-        printf("first node in tree is not a statement");
+        printf("first node in tree is not a statement\n");
     }
 }
 
